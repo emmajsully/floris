@@ -20,8 +20,10 @@
 # benefits of wake steering.
 
 import os
+from tracemalloc import start, stop
 
 import numpy as np
+import time
 import matplotlib.pyplot as plt
 
 import floris.tools as wfct
@@ -34,7 +36,7 @@ print("Running FLORIS with no yaw...")
 # Instantiate the FLORIS object
 file_dir = os.path.dirname(os.path.abspath(__file__))
 fi = wfct.floris_interface.FlorisInterface(
-    os.path.join(file_dir, "../../../example_input.json")
+    os.path.join(file_dir, "example_input.json")
 )
 
 # Set turbine locations to a 2 turbine array
@@ -71,12 +73,18 @@ print("Finding optimal yaw angles in FLORIS...")
 min_yaw = 0.0
 max_yaw = 25.0
 
-# Without uncertainty
+# Without Uncertainty
 # Instantiate the Optimization object
 yaw_opt = YawOptimization(fi, minimum_yaw_angle=min_yaw, maximum_yaw_angle=max_yaw)
 
 # Perform optimization
+start_no_unc = time.time()
 yaw_angles = yaw_opt.optimize()
+stop_no_unc = time.time()
+
+no_unc_time = stop_no_unc - start_no_unc
+print()
+print('Time to run yaw optimization without uncertainty: {}'.format(no_unc_time))   
 
 # With Uncertainty
 # Instantiate the Optimization object
@@ -89,7 +97,14 @@ yaw_opt = YawOptimization(
 )
 
 # Perform optimization
+start_unc = time.time()
 yaw_angles_unc = yaw_opt.optimize()
+stop_unc = time.time()
+
+unc_time = stop_unc - start_unc
+print()
+print('Time to run yaw optimization with uncertainty: {}'.format(unc_time))
+print()
 
 print("==========================================")
 print("yaw angles without uncertainty = ")
